@@ -40,6 +40,7 @@ import com.epb.ah.entity.Customer;
 import com.epb.ah.entity.EcDeliveryTimeslot;
 import com.epb.ah.entity.Ecbanner;
 import com.epb.ah.entity.Ecbest;
+import com.epb.ah.entity.EcbestSkuView;
 import com.epb.ah.entity.EcbookmarkView;
 import com.epb.ah.entity.Eccart;
 import com.epb.ah.entity.EccartlineView;
@@ -61,6 +62,7 @@ import com.epb.ah.repository.CustomerRepository;
 import com.epb.ah.repository.EcDeliveryTimeslotRepository;
 import com.epb.ah.repository.EcbannerRepository;
 import com.epb.ah.repository.EcbestRepository;
+import com.epb.ah.repository.EcbestSkuViewRepository;
 import com.epb.ah.repository.EcbookmarkRepository;
 import com.epb.ah.repository.EccartRepository;
 import com.epb.ah.repository.EccartlineViewRepository;
@@ -91,6 +93,35 @@ public class AppController {
 				.findAll(
 						Example.of(probe),
 						Sort.by("stkId"));
+		return ResponseEntity.ok(ecstks);
+	}
+
+	@GetMapping("/stocks-net-price-asc")
+	public ResponseEntity<List<Ecstk>> getEcstksNetPriceAsc(
+			@RequestParam final String orgId) {
+
+		final Ecstk probe = new Ecstk();
+		probe.setOrgId(orgId);
+		// on optional sectionId
+		final List<Ecstk> ecstks = this.ecstkRepository
+				.findAll(
+						Example.of(probe),
+						Sort.by("netPrice"));
+		return ResponseEntity.ok(ecstks);
+	}
+
+	@GetMapping("/stocks-net-price-desc")
+	public ResponseEntity<List<Ecstk>> getEcstksNetPriceDesc(
+			@RequestParam final String orgId) {
+
+		final Ecstk probe = new Ecstk();
+		probe.setOrgId(orgId);
+
+		// on optional sectionId
+		final List<Ecstk> ecstks = this.ecstkRepository
+				.findAll(
+						Example.of(probe),
+						Sort.by(Sort.Direction.DESC, "netPrice"));
 		return ResponseEntity.ok(ecstks);
 	}
 
@@ -282,7 +313,7 @@ public class AppController {
 
 		return ResponseEntity.ok(ecbanners);
 	}
-	
+
 	@GetMapping("/bests")
 	public ResponseEntity<List<Ecbest>> getEcbests(
 			@RequestParam final Character statusFlg,
@@ -292,6 +323,16 @@ public class AppController {
 				.findByStatusFlgAndOrgId(statusFlg, orgId);
 
 		return ResponseEntity.ok(Ecbests);
+	}
+
+	@GetMapping("/best-sku-views")
+	public ResponseEntity<List<EcbestSkuView>> getEcbestSkuViews(
+			@RequestParam final String orgId) {
+
+		final List<EcbestSkuView> ecbestSkuViews = this.ecbestSkuViewRepository
+				.findByOrgId(orgId);
+
+		return ResponseEntity.ok(ecbestSkuViews);
 	}
 
 	@PostMapping("/customer/{recKey}/update")
@@ -676,6 +717,7 @@ public class AppController {
 	private final EcDeliveryTimeslotRepository ecDeliveryTimeslotRepository;
 	private final EcbannerRepository ecbannerRepository;
 	private final EcbestRepository ecbestRepository;
+	private final EcbestSkuViewRepository ecbestSkuViewRepository;
 
 	private final ProcedureService procedureService;
 
@@ -706,7 +748,8 @@ public class AppController {
 			final PpcardLogRepository ppcardLogRepository,
 			final EcDeliveryTimeslotRepository ecDeliveryTimeslotRepository,
 			final EcbannerRepository ecbannerRepository,
-			final EcbestRepository ecbestRepository) {
+			final EcbestRepository ecbestRepository,
+			final EcbestSkuViewRepository ecbestSkuViewRepository) {
 
 		super();
 
@@ -731,6 +774,7 @@ public class AppController {
 		this.ecDeliveryTimeslotRepository = ecDeliveryTimeslotRepository;
 		this.ecbannerRepository = ecbannerRepository;
 		this.ecbestRepository = ecbestRepository;
+		this.ecbestSkuViewRepository = ecbestSkuViewRepository;
 
 	}
 
